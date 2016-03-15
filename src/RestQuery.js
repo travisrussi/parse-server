@@ -423,7 +423,7 @@ RestQuery.prototype.handleInclude = function() {
     this.include = this.include.slice(1);
     return this.handleInclude();
   }
-  
+
   return pathResponse;
 };
 
@@ -501,6 +501,11 @@ function findPointers(object, path) {
     if (object.__type == 'Pointer') {
       return [object];
     }
+
+    if (object.id !== 'Undefined' && object.id.__type == 'Pointer') {
+      return [object.id];
+    }
+
     throw new Parse.Error(Parse.Error.INVALID_QUERY,
                           'can only include pointer fields');
   }
