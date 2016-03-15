@@ -284,7 +284,7 @@ class Schema {
         return Promise.reject(error);
       });
   }
-  
+
   updateClass(className, submittedFields, classLevelPermissions, database) {
     if (!this.data[className]) {
       throw new Parse.Error(Parse.Error.INVALID_CLASS_NAME, `Class ${className} does not exist.`);
@@ -299,7 +299,7 @@ class Schema {
         throw new Parse.Error(255, `Field ${name} does not exist, cannot delete.`);
       }
     });
-    
+
     let newSchema = buildMergedSchemaObject(existingFields, submittedFields);
     let mongoObject = mongoSchemaFromFieldsAndClassNameAndCLP(newSchema, className, classLevelPermissions);
     if (!mongoObject.result) {
@@ -327,7 +327,7 @@ class Schema {
         });
         return Promise.all(promises);
       })
-      .then(() => { 
+      .then(() => {
         return this.setPermissions(className, classLevelPermissions)
       })
       .then(() => { return mongoSchemaToSchemaAPIResponse(mongoObject.result) });
@@ -413,7 +413,7 @@ class Schema {
     var expected = this.data[className][key];
     if (expected) {
       expected = (expected === 'map' ? 'object' : expected);
-      if (expected === type) {
+      if (expected === type || expected === 'object') {
         return Promise.resolve(this);
       } else {
         throw new Parse.Error(
@@ -697,7 +697,7 @@ function mongoSchemaFromFieldsAndClassNameAndCLP(fields, className, classLevelPe
       error: 'currently, only one GeoPoint field may exist in an object. Adding ' + geoPoints[1] + ' when ' + geoPoints[0] + ' already exists.',
     };
   }
-  
+
   validateCLP(classLevelPermissions);
   if (typeof classLevelPermissions !== 'undefined') {
     mongoObject._metadata = mongoObject._metadata || {};
@@ -886,11 +886,11 @@ function mongoSchemaToSchemaAPIResponse(schema) {
     className: schema._id,
     fields: mongoSchemaAPIResponseFields(schema),
   };
-  
+
   let classLevelPermissions = DefaultClassLevelPermissions;
   if (schema._metadata && schema._metadata.class_permissions) {
     classLevelPermissions = Object.assign(classLevelPermissions, schema._metadata.class_permissions);
-  } 
+  }
   result.classLevelPermissions = classLevelPermissions;
   return result;
 }
